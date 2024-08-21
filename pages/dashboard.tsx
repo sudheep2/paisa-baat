@@ -4,7 +4,9 @@ import { useRouter } from 'next/router';
 
 interface Bounty {
   id: string;
-  issueTitle: string;
+  title: string;
+  repoName: string;
+  url: string;
   amount: number;
   status: string;
 }
@@ -18,7 +20,9 @@ export default function Dashboard() {
   useEffect(() => {
     async function fetchBounties() {
       try {
-        const response = await fetch('/api/bounties');
+        const response = await fetch('http://localhost:3000/api/bounties', {
+          credentials: 'include' // This is important to include cookies
+        });
         if (!response.ok) {
           throw new Error('Failed to fetch bounties');
         }
@@ -52,12 +56,17 @@ export default function Dashboard() {
         <ul>
           {bounties.map((bounty) => (
             <li key={bounty.id}>
-              {bounty.issueTitle} - {bounty.amount} rupees - {bounty.status}
+              <a href={bounty.url} target="_blank" rel="noopener noreferrer">
+                {bounty.title}
+              </a>
+              {' - '}{bounty.amount} rupees - {bounty.status}
+              <br />
+              Repository: {bounty.repoName}
             </li>
           ))}
         </ul>
       )}
-      <p>To create a bounty, go to your GitHub repository and comment "/create-bounty [amount] rupees" on an issue.</p>
+      <p>To create a bounty, go to your GitHub repository and comment &quot;/create-bounty [amount] rupees&quot; on an issue.</p>
       <button onClick={() => router.push('/install-github-app')}>
         Install GitHub App on More Repositories
       </button>
