@@ -1,29 +1,35 @@
-// pages/index.tsx
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
+import axios from 'axios';
 import { useRouter } from 'next/router';
+axios.defaults.withCredentials = true;
+
 
 export default function Home() {
+  const [authenticated, setAuthenticated] = useState<boolean>(false);
   const router = useRouter();
 
   useEffect(() => {
-    async function checkAuth() {
-      try {
-        const response = await fetch('http://localhost:3000/api/check-auth', {
-          credentials: 'include'
-        });
-        if (response.ok) {
+    axios.get<{ authenticated: boolean }>(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/checkAuth`)
+      .then(res => {
+        if (res.data.authenticated) {
+          setAuthenticated(true);
           router.push('/dashboard');
-        } else {
-          router.push('/install-github-app');
         }
-      } catch (error) {
-        console.error('Error checking auth:', error);
-        router.push('/install-github-app');
-      }
-    }
-
-    checkAuth();
+      })
+      .catch(err => console.log('Not authenticated', err));
   }, [router]);
 
-  return <div>Loading...</div>;
+  const startAuthorization = () => {
+    router.push('/authorize');
+  };
+
+  return (
+    <div>
+      <h1>Welcome to the Bounty Management System</h1>
+      <p>Manage and claim bounties on GitHub with ease.</p>
+      <button onClick={startAuthorization}>
+        Start Creating or Claiming Bounties
+      </button>
+    </div>
+  );
 }

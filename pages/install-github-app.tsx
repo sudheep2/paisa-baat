@@ -8,7 +8,7 @@ export default function InstallGitHubApp() {
   useEffect(() => {
     async function initiateGitHubAppInstall() {
       try {
-        const response = await fetch('http://localhost:3000/api/github/login');
+        const response = await fetch('http://localhost:3001/api/github/login');
         const data = await response.json();
         if (data.url) {
           window.location.href = data.url;
