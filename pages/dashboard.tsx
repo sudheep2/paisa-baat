@@ -24,10 +24,6 @@ export default function Dashboard() {
     axios.get<User>(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/user/details`)
       .then(res => setUser(res.data))
       .catch(err => console.error('Failed to load user details', err));
-
-    axios.get<Bounty[]>(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/created_bounties`)
-      .then(res => setBounties(res.data))
-      .catch(err => console.error('Failed to load bounties', err));
   }, []);
 
   return (

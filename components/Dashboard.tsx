@@ -124,7 +124,7 @@ export default function DashboardComponent() {
             ))
           ) : (
             <div>
-              <p>You haven't created any bounties yet.</p>
+              <p>You haven&apos;t created any bounties yet.</p>
               <Image src="/path-to-create-bounty-image.png" alt="How to create a bounty" width={300} height={200} />
             </div>
           )}
@@ -166,7 +166,7 @@ export default function DashboardComponent() {
             ))
           ) : (
             <div>
-              <p>You haven't claimed any bounties yet.</p>
+              <p>You haven&apos;t claimed any bounties yet.</p>
               <Image src="/path-to-claim-bounty-image.png" alt="How to claim a bounty" width={300} height={200} />
             </div>
           )}
