@@ -1,5 +1,7 @@
 import { useEffect, useState } from 'react';
 import axios from 'axios';
+import DashboardComponent from '../components/Dashboard';
+
 axios.defaults.withCredentials = true;
 
 
@@ -39,13 +41,7 @@ export default function Dashboard() {
       )}
       <div>
         <h2>Your Bounties</h2>
-        <ul>
-          {bounties.map(bounty => (
-            <li key={bounty.id}>
-              {bounty.issue_title} - {bounty.amount} rupees
-            </li>
-          ))}
-        </ul>
+          <DashboardComponent />;
       </div>
     </div>
   );
