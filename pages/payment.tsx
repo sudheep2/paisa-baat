@@ -1,15 +1,15 @@
 // pages/payment.tsx
-import { useEffect, useState } from 'react';
-import { useRouter } from 'next/router';
-import axios from 'axios';
-import { useWallet, useConnection } from '@solana/wallet-adapter-react';
-import { WalletMultiButton } from '@solana/wallet-adapter-react-ui';
-import { 
-  PublicKey, 
-  Transaction, 
-  SystemProgram, 
+import { useEffect, useState } from "react";
+import { useRouter } from "next/router";
+import axios from "axios";
+import { useWallet, useConnection } from "@solana/wallet-adapter-react";
+import { WalletMultiButton } from "@solana/wallet-adapter-react-ui";
+import {
+  PublicKey,
+  Transaction,
+  SystemProgram,
   LAMPORTS_PER_SOL,
-} from '@solana/web3.js';
+} from "@solana/web3.js";
 
 export default function Payment() {
   const router = useRouter();
@@ -20,8 +20,15 @@ export default function Payment() {
   const { connection } = useConnection();
 
   const handlePayment = async () => {
-    if (!publicKey || !sendTransaction || !fromWalletAddress || !toWalletAddress || !amount || !bountyId) {
-      setError('Missing required information');
+    if (
+      !publicKey ||
+      !sendTransaction ||
+      !fromWalletAddress ||
+      !toWalletAddress ||
+      !amount ||
+      !bountyId
+    ) {
+      setError("Missing required information");
       return;
     }
 
@@ -46,21 +53,27 @@ export default function Payment() {
       transaction.feePayer = publicKey;
 
       const signature = await sendTransaction(transaction, connection);
-      
+
       // Wait for transaction confirmation
-      const confirmation = await connection.confirmTransaction(signature, 'confirmed');
+      const confirmation = await connection.confirmTransaction(
+        signature,
+        "confirmed"
+      );
 
       if (confirmation.value.err) {
-        throw new Error('Transaction failed');
+        throw new Error("Transaction failed");
       }
 
       // After successful transaction, update the bounty status
-      await axios.post(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/complete-bounty`, { bountyId });
-      
-      router.push('/dashboard');
+      await axios.post(
+        `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/complete-bounty`,
+        { bountyId }
+      );
+
+      router.push("/dashboard");
     } catch (error) {
-      console.error('Payment error:', error);
-      setError('Payment failed. Please try again.');
+      console.error("Payment error:", error);
+      setError("Payment failed. Please try again.");
     } finally {
       setIsLoading(false);
     }
