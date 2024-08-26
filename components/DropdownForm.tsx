@@ -48,8 +48,6 @@ const DropdownForm: React.FC<DropdownFormProps> = ({
 }) => {
 
     const onSubmit = (data: { claimant: string }) => {
-        const claimantId = parseInt(data.claimant);
-        onClaimantSelect(bountyId, claimantId);
         onApprove(bountyId);
     };
 
@@ -102,13 +100,14 @@ const DropdownForm: React.FC<DropdownFormProps> = ({
                                             <CommandEmpty>No claimant found.</CommandEmpty>
                                             <CommandGroup>
                                                 {claimants.map((claimant) => (
-                                                    <CommandItem
-                                                        value={claimant.claimant_name}
+                                                     <CommandItem
+                                                     value={claimant.claimant_name}
                                                         key={claimant.claimant_id}
                                                         onSelect={() => {
                                                             form.setValue("claimant", claimant.claimant_id.toString());
+                                                            onClaimantSelect(bountyId, claimant.claimant_id); // Call handleClaimantSelect here
                                                         }}
-                                                    >
+                                                 >
                                                         <Check
                                                             className={cn(
                                                                 "mr-2 h-4 w-4",
