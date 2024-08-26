@@ -2,7 +2,6 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 import Image from "next/image";
 import { useRouter } from "next/router";
-import styles from "./DashboardComponent.module.css";
 
 interface Bounty {
   id: number;
@@ -124,37 +123,42 @@ export default function DashboardComponent() {
   };
 
   if (isLoading) {
-    return <div className={styles.loading}>Loading dashboard data...</div>;
+    return <div className="text-center text-lg mt-8">Loading dashboard data...</div>;
   }
-
+  
   if (error) {
-    return <div className={styles.error}>Error: {error}</div>;
+    return <div className="text-center text-lg mt-8 text-red-500">Error: {error}</div>;
   }
 
   return (
-    <div className={styles.dashboard}>
-      <h1 className={styles.title}>Dashboard</h1>
+    <div className="max-w-[1200px] mx-auto p-8">
+      <h1 className="text-4xl mb-8 text-gray-800">Dashboard</h1>
 
-      <section className={styles.section}>
-        <h2 className={styles.sectionTitle}>Created Bounties</h2>
+      <section className="mb-12">
+        <h2 className="text-2xl mb-4 text-gray-700">Created Bounties</h2>
         {createdBounties.length > 0 ? (
-          <div className={styles.bountyGrid}>
+          <div className="grid grid-cols-[repeat(auto-fill,minmax(300px,1fr))] gap-6">
             {createdBounties.map((bounty) => (
-              <div key={bounty.id} className={styles.bountyCard}>
-                <h3 className={styles.bountyTitle}>{bounty.issue_title}</h3>
+              <div
+                key={bounty.id}
+                className="bg-gray-100 rounded-lg p-6 shadow-md"
+              >
+                <h3 className="text-lg mb-2 text-gray-800">
+                  {bounty.issue_title}
+                </h3>
                 <p>Amount: ${bounty.amount}</p>
                 <p>Status: {bounty.status}</p>
                 <a
                   href={bounty.issue_url}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className={styles.link}
+                  className="inline-block mt-2 mr-2 text-blue-500 hover:underline"
                 >
                   View Issue
                 </a>
                 <button
                   onClick={() => handleDeleteBounty(bounty.id)}
-                  className={styles.deleteButton}
+                  className="mt-4 py-2 px-4 bg-red-500 text-white rounded cursor-pointer"
                 >
                   Delete Bounty
                 </button>
@@ -162,7 +166,7 @@ export default function DashboardComponent() {
             ))}
           </div>
         ) : (
-          <div className={styles.emptyState}>
+          <div className="text-center p-8 bg-gray-100 rounded-lg">
             <p>You haven&apos;t created any bounties yet.</p>
             <Image
               src="/path-to-create-bounty-image.png"
@@ -175,16 +179,21 @@ export default function DashboardComponent() {
       </section>
 
       {bountiesToApprove.length > 0 && (
-        <section className={styles.section}>
-          <h2 className={styles.sectionTitle}>Bounties to Approve</h2>
-          <div className={styles.bountyGrid}>
+        <section className="mb-12">
+          <h2 className="text-2xl mb-4 text-gray-700">Bounties to Approve</h2>
+          <div className="grid grid-cols-[repeat(auto-fill,minmax(300px,1fr))] gap-6">
             {bountiesToApprove.map((bounty) => (
-              <div key={bounty.id} className={styles.bountyCard}>
-                <h3 className={styles.bountyTitle}>{bounty.issue_title}</h3>
+              <div
+                key={bounty.id}
+                className="bg-gray-100 rounded-lg p-6 shadow-md"
+              >
+                <h3 className="text-lg mb-2 text-gray-800">
+                  {bounty.issue_title}
+                </h3>
                 <p>Amount: ${bounty.amount}</p>
                 <p>Claimants:</p>
                 {bounty.claimants.map((claimant) => (
-                  <div key={claimant.claimant_id} className={styles.claimant}>
+                  <div key={claimant.claimant_id} className="mb-2">
                     <label>
                       <input
                         type="radio"
@@ -199,7 +208,7 @@ export default function DashboardComponent() {
                 ))}
                 <button
                   onClick={() => handleApproveBounty(bounty.id)}
-                  className={styles.approveButton}
+                  className="mt-4 py-2 px-4 bg-green-500 text-white rounded cursor-pointer disabled:bg-gray-300 disabled:cursor-not-allowed"
                   disabled={!selectedClaimants[bounty.id]}
                 >
                   Approve Bounty
@@ -208,7 +217,7 @@ export default function DashboardComponent() {
                   href={bounty.issue_url}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className={styles.link}
+                  className="inline-block mt-2 text-blue-500 hover:underline"
                 >
                   View Issue
                 </a>
@@ -218,13 +227,18 @@ export default function DashboardComponent() {
         </section>
       )}
 
-      <section className={styles.section}>
-        <h2 className={styles.sectionTitle}>Claimed Bounties</h2>
+      <section className="mb-12">
+        <h2 className="text-2xl mb-4 text-gray-700">Claimed Bounties</h2>
         {claimedBounties.length > 0 ? (
-          <div className={styles.bountyGrid}>
+          <div className="grid grid-cols-[repeat(auto-fill,minmax(300px,1fr))] gap-6">
             {claimedBounties.map((bounty) => (
-              <div key={bounty.id} className={styles.bountyCard}>
-                <h3 className={styles.bountyTitle}>{bounty.issue_title}</h3>
+              <div
+                key={bounty.id}
+                className="bg-gray-100 rounded-lg p-6 shadow-md"
+              >
+                <h3 className="text-lg mb-2 text-gray-800">
+                  {bounty.issue_title}
+                </h3>
                 <p>Amount: ${bounty.amount}</p>
                 <p>Status: {bounty.claim_status}</p>
                 <p>
@@ -234,7 +248,7 @@ export default function DashboardComponent() {
                   href={bounty.issue_url}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className={styles.link}
+                  className="inline-block mt-2 text-blue-500 hover:underline"
                 >
                   View Issue
                 </a>
@@ -242,7 +256,7 @@ export default function DashboardComponent() {
             ))}
           </div>
         ) : (
-          <div className={styles.emptyState}>
+          <div className="text-center p-8 bg-gray-100 rounded-lg">
             <p>You haven&apos;t claimed any bounties yet.</p>
             <Image
               src="/path-to-claim-bounty-image.png"

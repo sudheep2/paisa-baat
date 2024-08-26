@@ -1,7 +1,6 @@
 import { useEffect, useState } from 'react';
 import axios from 'axios';
 import { useRouter } from 'next/router';
-import styles from './Home.module.css'; // Import your CSS module
 
 axios.defaults.withCredentials = true;
 
@@ -25,11 +24,14 @@ export default function Home() {
   };
 
   return (
-    <div className={styles.homeContainer}>
-      <h1 className={styles.homeTitle}>Welcome to the Bounty Management System</h1>
-      <p className={styles.homeDescription}>Manage and claim bounties on GitHub with ease.</p>
-      <p className={styles.homeWalletInfo}>You'll need to connect a Solana wallet to participate.</p>
-      <button className={styles.homeButton} onClick={startAuthorization}>
+    <div className="flex flex-col justify-center items-center min-h-screen bg-gray-100 font-sans">
+      <h1 className="m-0 text-4xl font-bold text-gray-800 text-center">Welcome to the Bounty Management System</h1>
+      <p className="my-4 text-lg text-center text-gray-500">Manage and claim bounties on GitHub with ease.</p>
+      <p className="my-4 text-lg text-center text-gray-500">You&apos;ll need to connect a Solana wallet to participate.</p>
+      <button
+        className="bg-blue-500 text-white py-4 px-8 rounded-lg cursor-pointer transition duration-200 ease-in-out hover:bg-blue-600"
+        onClick={startAuthorization}
+      >
         Start Creating or Claiming Bounties
       </button>
     </div>
