@@ -40,7 +40,7 @@ export default function Authorize() {
   const checkAndRedirect = (authData: AuthResponse) => {
     if (
       authData.solanaAddressSet &&
-      authData.isAppInstalled &&
+      (userChoice === "claim" || authData.isAppInstalled) &&
       authData.aadhaarPanVerified &&
       authData.authenticated
     ) {

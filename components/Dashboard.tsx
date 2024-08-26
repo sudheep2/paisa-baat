@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 import Image from "next/image";
 import { useRouter } from "next/router";
+import DropdownForm from "./DropdownForm";
 
 interface Bounty {
   id: number;
@@ -192,27 +193,12 @@ export default function DashboardComponent() {
                 </h3>
                 <p>Amount: ${bounty.amount}</p>
                 <p>Claimants:</p>
-                {bounty.claimants.map((claimant) => (
-                  <div key={claimant.claimant_id} className="mb-2">
-                    <label>
-                      <input
-                        type="radio"
-                        name={`claimant-${bounty.id}`}
-                        onChange={() =>
-                          handleClaimantSelect(bounty.id, claimant.claimant_id)
-                        }
-                      />
-                      {claimant.claimant_name} ({claimant.claimant_email})
-                    </label>
-                  </div>
-                ))}
-                <button
-                  onClick={() => handleApproveBounty(bounty.id)}
-                  className="mt-4 py-2 px-4 bg-green-500 text-white rounded cursor-pointer disabled:bg-gray-300 disabled:cursor-not-allowed"
-                  disabled={!selectedClaimants[bounty.id]}
-                >
-                  Approve Bounty
-                </button>
+                <DropdownForm
+                    bountyId={bounty.id}
+                    claimants={bounty.claimants}
+                    onClaimantSelect={handleClaimantSelect}
+                    onApprove={handleApproveBounty}
+                  />
                 <a
                   href={bounty.issue_url}
                   target="_blank"
