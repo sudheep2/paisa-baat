@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 import Image from "next/image";
 import { useRouter } from "next/router";
+import styles from "./DashboardComponent.module.css";
 
 interface Bounty {
   id: number;
@@ -39,6 +40,10 @@ export default function DashboardComponent() {
   const [bountiesToApprove, setBountiesToApprove] = useState<BountyToApprove[]>(
     []
   );
+  const [selectedClaimants, setSelectedClaimants] = useState<{
+    [key: number]: number;
+  }>({});
+
   const [claimedBounties, setClaimedBounties] = useState<ClaimedBounty[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -91,14 +96,19 @@ export default function DashboardComponent() {
     }
   };
 
-  const handleApproveBounty = async (bountyId: number, claimantId: number) => {
+  const handleApproveBounty = async (bountyId: number) => {
+    const claimantId = selectedClaimants[bountyId];
+    if (!claimantId) {
+      setError("Please select a claimant before approving the bounty.");
+      return;
+    }
+
     try {
       const response = await axios.post<ApprovalResponse>(
         `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/approve-bounty-verify`,
         { bountyId, claimantId }
       );
 
-      // Redirect to the payment page with the approval response data
       router.push({
         pathname: "/payment",
         query: { ...response.data },
@@ -109,40 +119,50 @@ export default function DashboardComponent() {
     }
   };
 
+  const handleClaimantSelect = (bountyId: number, claimantId: number) => {
+    setSelectedClaimants((prev) => ({ ...prev, [bountyId]: claimantId }));
+  };
+
   if (isLoading) {
-    return <div>Loading dashboard data...</div>;
+    return <div className={styles.loading}>Loading dashboard data...</div>;
   }
 
   if (error) {
-    return <div>Error: {error}</div>;
+    return <div className={styles.error}>Error: {error}</div>;
   }
 
   return (
-    <div>
-      <h1>Dashboard</h1>
+    <div className={styles.dashboard}>
+      <h1 className={styles.title}>Dashboard</h1>
 
-      <section>
-        <h2>Created Bounties</h2>
+      <section className={styles.section}>
+        <h2 className={styles.sectionTitle}>Created Bounties</h2>
         {createdBounties.length > 0 ? (
-          createdBounties.map((bounty) => (
-            <div key={bounty.id}>
-              <h3>{bounty.issue_title}</h3>
-              <p>Amount: {bounty.amount}</p>
-              <p>Status: {bounty.status}</p>
-              <a
-                href={bounty.issue_url}
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                View Issue
-              </a>
-              <button onClick={() => handleDeleteBounty(bounty.id)}>
-                Delete Bounty
-              </button>
-            </div>
-          ))
+          <div className={styles.bountyGrid}>
+            {createdBounties.map((bounty) => (
+              <div key={bounty.id} className={styles.bountyCard}>
+                <h3 className={styles.bountyTitle}>{bounty.issue_title}</h3>
+                <p>Amount: ${bounty.amount}</p>
+                <p>Status: {bounty.status}</p>
+                <a
+                  href={bounty.issue_url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className={styles.link}
+                >
+                  View Issue
+                </a>
+                <button
+                  onClick={() => handleDeleteBounty(bounty.id)}
+                  className={styles.deleteButton}
+                >
+                  Delete Bounty
+                </button>
+              </div>
+            ))}
+          </div>
         ) : (
-          <div>
+          <div className={styles.emptyState}>
             <p>You haven&apos;t created any bounties yet.</p>
             <Image
               src="/path-to-create-bounty-image.png"
@@ -155,59 +175,74 @@ export default function DashboardComponent() {
       </section>
 
       {bountiesToApprove.length > 0 && (
-        <section>
-          <h2>Bounties to Approve</h2>
-          {bountiesToApprove.map((bounty) => (
-            <div key={bounty.id}>
-              <h3>{bounty.issue_title}</h3>
-              <p>Amount: {bounty.amount}</p>
-              <p>Claimants:</p>
-              {bounty.claimants.map((claimant) => (
-                <div key={claimant.claimant_id}>
-                  <p>
-                    {claimant.claimant_name} ({claimant.claimant_email})
-                  </p>
-                  <button
-                    onClick={() =>
-                      handleApproveBounty(bounty.id, claimant.claimant_id)
-                    }
-                  >
-                    Approve for this claimant
-                  </button>
-                </div>
-              ))}
-              <a
-                href={bounty.issue_url}
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                View Issue
-              </a>
-            </div>
-          ))}
+        <section className={styles.section}>
+          <h2 className={styles.sectionTitle}>Bounties to Approve</h2>
+          <div className={styles.bountyGrid}>
+            {bountiesToApprove.map((bounty) => (
+              <div key={bounty.id} className={styles.bountyCard}>
+                <h3 className={styles.bountyTitle}>{bounty.issue_title}</h3>
+                <p>Amount: ${bounty.amount}</p>
+                <p>Claimants:</p>
+                {bounty.claimants.map((claimant) => (
+                  <div key={claimant.claimant_id} className={styles.claimant}>
+                    <label>
+                      <input
+                        type="radio"
+                        name={`claimant-${bounty.id}`}
+                        onChange={() =>
+                          handleClaimantSelect(bounty.id, claimant.claimant_id)
+                        }
+                      />
+                      {claimant.claimant_name} ({claimant.claimant_email})
+                    </label>
+                  </div>
+                ))}
+                <button
+                  onClick={() => handleApproveBounty(bounty.id)}
+                  className={styles.approveButton}
+                  disabled={!selectedClaimants[bounty.id]}
+                >
+                  Approve Bounty
+                </button>
+                <a
+                  href={bounty.issue_url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className={styles.link}
+                >
+                  View Issue
+                </a>
+              </div>
+            ))}
+          </div>
         </section>
       )}
 
-      <section>
-        <h2>Claimed Bounties</h2>
+      <section className={styles.section}>
+        <h2 className={styles.sectionTitle}>Claimed Bounties</h2>
         {claimedBounties.length > 0 ? (
-          claimedBounties.map((bounty) => (
-            <div key={bounty.id}>
-              <h3>{bounty.issue_title}</h3>
-              <p>Amount: {bounty.amount}</p>
-              <p>Status: {bounty.claim_status}</p>
-              <p>Claimed at: {new Date(bounty.claimed_at).toLocaleString()}</p>
-              <a
-                href={bounty.issue_url}
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                View Issue
-              </a>
-            </div>
-          ))
+          <div className={styles.bountyGrid}>
+            {claimedBounties.map((bounty) => (
+              <div key={bounty.id} className={styles.bountyCard}>
+                <h3 className={styles.bountyTitle}>{bounty.issue_title}</h3>
+                <p>Amount: ${bounty.amount}</p>
+                <p>Status: {bounty.claim_status}</p>
+                <p>
+                  Claimed at: {new Date(bounty.claimed_at).toLocaleString()}
+                </p>
+                <a
+                  href={bounty.issue_url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className={styles.link}
+                >
+                  View Issue
+                </a>
+              </div>
+            ))}
+          </div>
         ) : (
-          <div>
+          <div className={styles.emptyState}>
             <p>You haven&apos;t claimed any bounties yet.</p>
             <Image
               src="/path-to-claim-bounty-image.png"

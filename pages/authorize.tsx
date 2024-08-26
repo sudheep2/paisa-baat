@@ -7,15 +7,16 @@ import { WalletMultiButton } from "@solana/wallet-adapter-react-ui";
 
 axios.defaults.withCredentials = true;
 
-interface Authresponse {
+interface AuthResponse {
   authenticated: boolean;
   isAppInstalled: boolean;
   aadhaarPanVerified: boolean;
+  aadhaarPan: string;
   solanaAddressSet: boolean;
 }
 
-async function verifyAuth() {
-  const res = await axios.get<Authresponse>(
+async function verifyAuth(): Promise<AuthResponse> {
+  const res = await axios.get<AuthResponse>(
     `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/checkAuth`
   );
   return res.data;
@@ -23,31 +24,36 @@ async function verifyAuth() {
 
 export default function Authorize() {
   const [isLoading, setIsLoading] = useState(true);
-  const [githubAuthorized, setGithubAuthorized] = useState<boolean>(false);
-  const [aadhaarPanVerified, setAadhaarPanVerified] = useState<boolean>(false);
-  const [installationComplete, setInstallationComplete] =
-    useState<boolean>(false);
+  const [authState, setAuthState] = useState<AuthResponse>({
+    authenticated: false,
+    isAppInstalled: false,
+    aadhaarPanVerified: false,
+    aadhaarPan: "",
+    solanaAddressSet: false,
+  });
   const [userChoice, setUserChoice] = useState<"create" | "claim" | null>(null);
   const { publicKey, connected } = useWallet();
 
   const router = useRouter();
 
+  const checkAndRedirect = (authData: AuthResponse) => {
+    if (
+      authData.solanaAddressSet &&
+      authData.isAppInstalled &&
+      authData.aadhaarPanVerified &&
+      authData.authenticated
+    ) {
+      router.push("/dashboard");
+    }
+  };
+
   useEffect(() => {
     const initializeAuth = async () => {
       try {
-        const [authResult] = await Promise.all([verifyAuth()]);
-        setGithubAuthorized(authResult.authenticated);
-        setAadhaarPanVerified(authResult.aadhaarPanVerified);
-        setInstallationComplete(authResult.isAppInstalled);
+        const authResult = await verifyAuth();
+        setAuthState(authResult);
         setUserChoice(authResult.isAppInstalled ? "claim" : "create");
-        if (
-          authResult.solanaAddressSet &&
-          authResult.isAppInstalled &&
-          authResult.aadhaarPanVerified &&
-          authResult.authenticated
-        ) {
-          router.push("/dashboard");
-        }
+        checkAndRedirect(authResult);
       } catch (error) {
         console.error("Error during initialization:", error);
       } finally {
@@ -61,22 +67,24 @@ export default function Authorize() {
   useEffect(() => {
     if (isLoading) return;
 
-    // Check if GitHub authorization is complete
-    if (router.query.code && router.query.setup_action) {
-      axios
-        .get(
-          `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/github/callback${window.location.search}`
-        )
-        .then(() => setInstallationComplete(true))
-        .catch((err) => console.error(err));
-    } else if (router.query.code) {
-      axios
-        .get(
-          `${process.env.NEXT_PUBLIC_BACKEND_URL}/auth/github/callback${window.location.search}`
-        )
-        .then(() => setGithubAuthorized(true))
-        .catch((err) => console.error(err));
-    }
+    const handleCallback = async () => {
+      if (router.query.code) {
+        try {
+          const endpoint = router.query.setup_action
+            ? `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/github/callback`
+            : `${process.env.NEXT_PUBLIC_BACKEND_URL}/auth/github/callback`;
+
+          await axios.get(`${endpoint}${window.location.search}`);
+          const updatedAuthState = await verifyAuth();
+          setAuthState(updatedAuthState);
+          checkAndRedirect(updatedAuthState);
+        } catch (err) {
+          console.error(err);
+        }
+      }
+    };
+
+    handleCallback();
   }, [router.query, isLoading]);
 
   const handleGithubAuthorization = () => {
@@ -90,15 +98,20 @@ export default function Authorize() {
       .catch((err) => console.error(err));
   };
 
-  const handleVerifyAadhaarPan = (aadhaarPan: string) => {
-    axios
-      .post(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/user/verify`, {
-        aadhaarPan,
-      })
-      .then(() => {
-        setAadhaarPanVerified(true);
-      })
-      .catch((err) => console.error(err));
+  const handleVerifyAadhaarPan = async (aadhaarPan: string) => {
+    try {
+      await axios.post(
+        `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/user/verify`,
+        {
+          aadhaarPan,
+        }
+      );
+      const updatedAuthState = await verifyAuth();
+      setAuthState(updatedAuthState);
+      checkAndRedirect(updatedAuthState);
+    } catch (err) {
+      console.error(err);
+    }
   };
 
   const handleRepoInstallation = () => {
@@ -119,18 +132,15 @@ export default function Authorize() {
     }
 
     try {
-      const response = await axios.post(
+      await axios.post(
         `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/user/set_solana-address`,
         {
           solanaAddress: publicKey.toString(),
         }
       );
-
-      if (response.status === 200) {
-        router.push("/dashboard");
-      } else {
-        console.error("Failed to set Solana address");
-      }
+      const updatedAuthState = await verifyAuth();
+      setAuthState(updatedAuthState);
+      checkAndRedirect(updatedAuthState);
     } catch (err) {
       console.error("Error setting Solana address:", err);
     }
@@ -148,36 +158,42 @@ export default function Authorize() {
           <h2>1. Authorize with GitHub</h2>
           <button
             onClick={handleGithubAuthorization}
-            disabled={githubAuthorized}
+            disabled={authState.authenticated}
           >
-            {githubAuthorized ? "Authorized" : "Authorize with GitHub"}
+            {authState.authenticated ? "Authorized" : "Authorize with GitHub"}
           </button>
         </div>
-        {githubAuthorized && (
+        {authState.authenticated && (
           <div>
             <h2>2. Verify Aadhaar/PAN</h2>
             <input
               type="text"
-              placeholder="Enter Aadhaar/PAN"
+              placeholder={authState.aadhaarPan || "Enter Aadhaar/PAN"}
               onBlur={(e) => handleVerifyAadhaarPan(e.target.value)}
-              disabled={aadhaarPanVerified}
+              disabled={authState.aadhaarPanVerified}
             />
           </div>
         )}
-        {aadhaarPanVerified && !userChoice && (
+        {authState.aadhaarPanVerified && !userChoice && (
           <div>
             <h2>3. Choose Your Action</h2>
-            <button onClick={() => setUserChoice("create")}>
+            <button
+              onClick={() => setUserChoice("create")}
+              style={{ margin: "10px 0" }}
+            >
               Create a Bounty
             </button>
-            <button onClick={() => setUserChoice("claim")}>
+            <button
+              onClick={() => setUserChoice("claim")}
+              style={{ margin: "10px 0" }}
+            >
               Claim a Bounty
             </button>
           </div>
         )}
-        {aadhaarPanVerified &&
+        {authState.aadhaarPanVerified &&
           userChoice === "create" &&
-          !installationComplete && (
+          !authState.isAppInstalled && (
             <div>
               <h2>4. Install GitHub App</h2>
               <button onClick={handleRepoInstallation}>
@@ -185,8 +201,8 @@ export default function Authorize() {
               </button>
             </div>
           )}
-        {((aadhaarPanVerified && userChoice === "claim") ||
-          installationComplete) && (
+        {((authState.aadhaarPanVerified && userChoice === "claim") ||
+          authState.isAppInstalled) && (
           <div>
             <h2>
               {userChoice === "create" ? "5" : "4"}. Connect Solana Wallet
