@@ -4,6 +4,7 @@ import { useRouter } from "next/router";
 import { Suspense } from "react";
 import { useWallet } from "@solana/wallet-adapter-react";
 import { WalletMultiButton } from "@solana/wallet-adapter-react-ui";
+import { motion, AnimatePresence } from "framer-motion";
 
 axios.defaults.withCredentials = true;
 
@@ -146,79 +147,139 @@ export default function Authorize() {
     }
   };
 
-  if (isLoading) {
-    return <div>Loading...</div>;
-  }
+  const renderStep = () => {
+    if (!authState.authenticated) {
+      return (
+        <AuthStep
+          title="Authorize with GitHub"
+          description="Connect your GitHub account to get started."
+          action={
+            <button
+              onClick={handleGithubAuthorization}
+              className="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded transition duration-300"
+            >
+              Authorize with GitHub
+            </button>
+          }
+        />
+      );
+    }
 
-  return (
-    <Suspense fallback={<div>Loading...</div>}>
-      <h1>Authorize Your Account</h1>
-      <div>
-        <div>
-          <h2>1. Authorize with GitHub</h2>
-          <button
-            onClick={handleGithubAuthorization}
-            disabled={authState.authenticated}
-          >
-            {authState.authenticated ? "Authorized" : "Authorize with GitHub"}
-          </button>
-        </div>
-        {authState.authenticated && (
-          <div>
-            <h2>2. Verify Aadhaar/PAN</h2>
+    if (!authState.aadhaarPanVerified) {
+      return (
+        <AuthStep
+          title="Verify Aadhaar/PAN"
+          description="Enter your Aadhaar or PAN number for verification."
+          action={
             <input
               type="text"
               placeholder={authState.aadhaarPan || "Enter Aadhaar/PAN"}
               onBlur={(e) => handleVerifyAadhaarPan(e.target.value)}
-              disabled={authState.aadhaarPanVerified}
+              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
-          </div>
-        )}
-        {authState.aadhaarPanVerified && !userChoice && (
-          <div>
-            <h2>3. Choose Your Action</h2>
-            <button
-              onClick={() => setUserChoice("create")}
-              style={{ margin: "10px 0" }}
-            >
-              Create a Bounty
-            </button>
-            <button
-              onClick={() => setUserChoice("claim")}
-              style={{ margin: "10px 0" }}
-            >
-              Claim a Bounty
-            </button>
-          </div>
-        )}
-        {authState.aadhaarPanVerified &&
-          userChoice === "create" &&
-          !authState.isAppInstalled && (
-            <div>
-              <h2>4. Install GitHub App</h2>
-              <button onClick={handleRepoInstallation}>
-                Install GitHub App
+          }
+        />
+      );
+    }
+
+    if (!userChoice) {
+      return (
+        <AuthStep
+          title="Choose Your Action"
+          description="Select whether you want to create or claim a bounty."
+          action={
+            <div className="space-y-4">
+              <button
+                onClick={() => setUserChoice("create")}
+                className="w-full bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded transition duration-300"
+              >
+                Create a Bounty
+              </button>
+              <button
+                onClick={() => setUserChoice("claim")}
+                className="w-full bg-purple-500 hover:bg-purple-600 text-white font-bold py-2 px-4 rounded transition duration-300"
+              >
+                Claim a Bounty
               </button>
             </div>
-          )}
-        {((authState.aadhaarPanVerified && userChoice === "claim") ||
-          authState.isAppInstalled) && (
-          <div>
-            <h2>
-              {userChoice === "create" ? "5" : "4"}. Connect Solana Wallet
-            </h2>
-            <WalletMultiButton />
+          }
+        />
+      );
+    }
+
+    if (userChoice === "create" && !authState.isAppInstalled) {
+      return (
+        <AuthStep
+          title="Install GitHub App"
+          description="Install our GitHub app to manage your bounties."
+          action={
+            <button
+              onClick={handleRepoInstallation}
+              className="bg-gray-800 hover:bg-gray-900 text-white font-bold py-2 px-4 rounded transition duration-300"
+            >
+              Install GitHub App
+            </button>
+          }
+        />
+      );
+    }
+
+    return (
+      <AuthStep
+        title="Connect Solana Wallet"
+        description="Link your Solana wallet to receive or send payments."
+        action={
+          <div className="space-y-4">
+            <WalletMultiButton className="!bg-orange-500 hover:!bg-orange-600 text-white font-bold py-2 px-4 rounded transition duration-300" />
             {connected && (
               <div>
-                <p>Connected wallet: {publicKey?.toString()}</p>
-                <button onClick={handleSolanaConnection}>
+                <p className="text-sm text-gray-600 mb-2">
+                  Connected wallet: {publicKey?.toString()}
+                </p>
+                <button
+                  onClick={handleSolanaConnection}
+                  className="w-full bg-orange-500 hover:bg-orange-600 text-white font-bold py-2 px-4 rounded transition duration-300"
+                >
                   Confirm Solana Wallet
                 </button>
               </div>
             )}
           </div>
-        )}
+        }
+      />
+    );
+  };
+
+  if (isLoading) {
+    return <div className="flex items-center justify-center h-screen">Loading...</div>;
+  }
+
+  return (
+    <Suspense fallback={<div className="flex items-center justify-center h-screen">Loading...</div>}>
+      <div className="min-h-screen bg-gray-100 flex flex-col items-center justify-center px-4">
+        <h1 className="text-4xl font-bold text-gray-800 mb-8">Authorize Your Account</h1>
+        <AnimatePresence mode="wait">
+          <motion.div
+            key={+!!authState.authenticated + +!!authState.aadhaarPanVerified + (userChoice || "")}
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -20 }}
+            transition={{ duration: 0.3 }}
+          >
+            {renderStep()}
+          </motion.div>
+        </AnimatePresence>
       </div>
     </Suspense>
+  );
+}
+
+function AuthStep({ title, description, action }: { title: string; description: string; action: React.ReactNode }) {
+  return (
+    <div className="bg-white shadow-lg rounded-lg p-6 w-full max-w-md">
+      <h2 className="text-2xl font-semibold text-gray-800 mb-2">{title}</h2>
+      <p className="text-gray-600 mb-4">{description}</p>
+      {action}
+    </div>
   );
 }
