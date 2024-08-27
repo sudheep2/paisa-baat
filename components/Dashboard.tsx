@@ -3,6 +3,7 @@ import axios from "axios";
 import Image from "next/image";
 import { useRouter } from "next/router";
 import DropdownForm from "./DropdownForm";
+import BountyCard from "./ui/bountyCard";
 
 interface Bounty {
   id: number;
@@ -12,6 +13,8 @@ interface Bounty {
   repository: string;
   issue_title: string;
   issue_url: string;
+  claimed_at: string;
+  claim_status?: "Accepted" | "Rejected" | "Pending"; // make claim_status optional
 }
 
 interface BountyToApprove extends Bounty {
@@ -138,34 +141,19 @@ export default function DashboardComponent() {
       <section className="mb-12">
         <h2 className="text-2xl mb-4 text-gray-700">Created Bounties</h2>
         {createdBounties.length > 0 ? (
-          <div className="grid grid-cols-[repeat(auto-fill,minmax(300px,1fr))] gap-6">
-            {createdBounties.map((bounty) => (
-              <div
-                key={bounty.id}
-                className="bg-gray-100 rounded-lg p-6 shadow-md"
-              >
-                <h3 className="text-lg mb-2 text-gray-800">
-                  {bounty.issue_title}
-                </h3>
-                <p>Amount: ${bounty.amount}</p>
-                <p>Status: {bounty.status}</p>
-                <a
-                  href={bounty.issue_url}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-block mt-2 mr-2 text-blue-500 hover:underline"
-                >
-                  View Issue
-                </a>
-                <button
-                  onClick={() => handleDeleteBounty(bounty.id)}
-                  className="mt-4 py-2 px-4 bg-red-500 text-white rounded cursor-pointer"
-                >
-                  Delete Bounty
-                </button>
-              </div>
-            ))}
-          </div>
+         <div className="grid grid-cols-3 gap-4"> {/* Use grid for layout */}
+         {createdBounties.map((bounty) => (
+          <BountyCard 
+                key={bounty.id} 
+                bounty={{ 
+                  ...bounty, 
+                  claimed_at: bounty.claimed_at || '', 
+                  claim_status: bounty.claim_status || 'Pending' // default to 'Pending' if claim_status is undefined
+                }} 
+                onDelete={handleDeleteBounty} 
+          />
+         ))}
+       </div>
         ) : (
           <div className="text-center p-8 bg-gray-100 rounded-lg">
             <p>You haven&apos;t created any bounties yet.</p>
@@ -216,31 +204,11 @@ export default function DashboardComponent() {
       <section className="mb-12">
         <h2 className="text-2xl mb-4 text-gray-700">Claimed Bounties</h2>
         {claimedBounties.length > 0 ? (
-          <div className="grid grid-cols-[repeat(auto-fill,minmax(300px,1fr))] gap-6">
-            {claimedBounties.map((bounty) => (
-              <div
-                key={bounty.id}
-                className="bg-gray-100 rounded-lg p-6 shadow-md"
-              >
-                <h3 className="text-lg mb-2 text-gray-800">
-                  {bounty.issue_title}
-                </h3>
-                <p>Amount: ${bounty.amount}</p>
-                <p>Status: {bounty.claim_status}</p>
-                <p>
-                  Claimed at: {new Date(bounty.claimed_at).toLocaleString()}
-                </p>
-                <a
-                  href={bounty.issue_url}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-block mt-2 text-blue-500 hover:underline"
-                >
-                  View Issue
-                </a>
-              </div>
-            ))}
-          </div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4"> 
+          {claimedBounties.map((bounty) => (
+            <BountyCard key={bounty.id} bounty={bounty} variant="claimed" /> 
+          ))}
+        </div>
         ) : (
           <div className="text-center p-8 bg-gray-100 rounded-lg">
             <p>You haven&apos;t claimed any bounties yet.</p>
