@@ -11,6 +11,11 @@ import {
   LAMPORTS_PER_SOL,
 } from "@solana/web3.js";
 
+const truncateAddress = (address: string, charsToShow = 10) => {
+  if (!address) return "";
+  return `${address.slice(0, charsToShow)}...${address.slice(-charsToShow)}`;
+};
+
 export default function Payment() {
   const router = useRouter();
   const { fromWalletAddress, toWalletAddress, amount, bountyId } = router.query;
@@ -88,17 +93,40 @@ export default function Payment() {
   }
 
   return (
-    <div>
-      <h1>Complete Bounty Payment</h1>
-      <p>From: {fromWalletAddress}</p>
-      <p>To: {toWalletAddress}</p>
-      <p>Amount: {amount} SOL</p>
-      <WalletMultiButton />
-      {publicKey && (
-        <button onClick={handlePayment} disabled={isLoading}>
-          Complete Payment
-        </button>
-      )}
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-400 to-purple-500">
+      <div className="bg-white p-8 rounded-lg shadow-lg max-w-md w-full space-y-6">
+        <h1 className="text-3xl font-bold text-center mb-4 text-gray-800 text-shadow">
+          {" "}
+          {/* Added text-shadow */}
+          Complete Bounty Payment
+        </h1>
+
+        <div className="space-y-2">
+          <p className="text-gray-700 text-shadow-sm">
+            {" "}
+            {/* Added text-shadow-sm */}
+            From: {truncateAddress(fromWalletAddress as string)}
+          </p>
+          <p className="text-gray-700 text-shadow-sm">
+            To: {truncateAddress(toWalletAddress as string)}
+          </p>
+          <p className="text-gray-700 text-shadow-sm">Amount: {amount} SOL</p>
+        </div>
+
+        <WalletMultiButton className="w-full mb-4" />
+
+        {publicKey && (
+          <button
+            onClick={handlePayment}
+            disabled={isLoading}
+            className="w-full bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline disabled:opacity-50 text-shadow"
+          >
+            {isLoading ? "Processing..." : "Complete Payment"}
+          </button>
+        )}
+
+        {error && <p className="mt-4 text-red-500 text-center">{error}</p>}
+      </div>
     </div>
   );
 }
