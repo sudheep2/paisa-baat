@@ -2,23 +2,24 @@
 import { useState, useEffect } from 'react';
 import { useWallet } from '@solana/wallet-adapter-react';
 import { WalletDisconnectButton, WalletMultiButton } from '@solana/wallet-adapter-react-ui';
-import axios from 'axios';
 import { useRouter } from 'next/router';
+import axios from 'axios';
 
 axios.defaults.withCredentials = true;
 
-export default function updateWallet() {
+// Assuming you have a base URL for your API
+const API_BASE_URL = process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:3001';
+
+export default function ChangeSolanaAddress() {
   const { publicKey, connected } = useWallet();
   const [currentAddress, setCurrentAddress] = useState<string | null>(null);
-
+  const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
 
   useEffect(() => {
-    // Fetch the current Solana address from your backend
     const fetchCurrentAddress = async () => {
       try {
-        const response = await axios.get(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/user/details`);
-
+        const response = await axios.get(`${API_BASE_URL}/api/user/details`);
         setCurrentAddress(response.data.solana_address);
       } catch (error) {
         console.error('Error fetching current address:', error);
@@ -31,23 +32,26 @@ export default function updateWallet() {
   const handleChangeAddress = async () => {
     if (!publicKey) return;
 
+    setIsLoading(true);
     try {
       const response = await axios.post(
-        `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/user/set_solana-address`,
+        `${API_BASE_URL}/api/user/set_solana-address`,
         { solanaAddress: publicKey.toString() },
         { withCredentials: true }
-      )
+      );
 
       if (response.status === 200) {
         setCurrentAddress(publicKey.toString());
         alert('Solana address updated successfully!');
-        
+        router.push('/dashboard'); // Redirect to dashboard or profile page
       } else {
         throw new Error('Failed to update Solana address');
       }
     } catch (error) {
       console.error('Error updating Solana address:', error);
       alert('Failed to update Solana address. Please try again.');
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -58,7 +62,7 @@ export default function updateWallet() {
         <p>Current Solana Address: {currentAddress || 'Not set'}</p>
       </div>
       <div className="mb-4">
-        <WalletMultiButton />
+        <WalletMultiButton className='mb-4' />
         <WalletDisconnectButton />
       </div>
       {connected && (
@@ -66,9 +70,10 @@ export default function updateWallet() {
           <p>New Solana Address: {publicKey?.toString()}</p>
           <button
             onClick={handleChangeAddress}
-            className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mt-4"
+            disabled={isLoading}
+            className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mt-4 disabled:opacity-50"
           >
-            Update Solana Address
+            {isLoading ? 'Updating...' : 'Update Solana Address'}
           </button>
         </div>
       )}
