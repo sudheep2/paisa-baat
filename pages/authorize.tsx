@@ -5,23 +5,11 @@ import { Suspense } from "react";
 import { useWallet } from "@solana/wallet-adapter-react";
 import { WalletMultiButton } from "@solana/wallet-adapter-react-ui";
 import { motion, AnimatePresence } from "framer-motion";
+import { verifyAuth } from "@/lib/authUtils";
+import { AuthResponse } from "@/lib/types";
 
 axios.defaults.withCredentials = true;
 
-interface AuthResponse {
-  authenticated: boolean;
-  isAppInstalled: boolean;
-  aadhaarPanVerified: boolean;
-  aadhaarPan: string;
-  solanaAddressSet: boolean;
-}
-
-async function verifyAuth(): Promise<AuthResponse> {
-  const res = await axios.get<AuthResponse>(
-    `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/checkAuth`
-  );
-  return res.data;
-}
 
 export default function Authorize() {
   const [isLoading, setIsLoading] = useState(true);

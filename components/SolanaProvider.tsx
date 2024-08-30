@@ -21,7 +21,6 @@ export default function SolanaProvider({ children }: SolanaProviderProps) {
   const wallets = useMemo(
     () => [
       new PhantomWalletAdapter(),
-      // Add other wallet adapters here
     ],
     []
   );
