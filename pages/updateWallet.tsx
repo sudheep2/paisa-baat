@@ -4,6 +4,7 @@ import { useWallet } from '@solana/wallet-adapter-react';
 import { WalletDisconnectButton, WalletMultiButton } from '@solana/wallet-adapter-react-ui';
 import { useRouter } from 'next/router';
 import axios from 'axios';
+import Header from '@/components/Header';
 
 axios.defaults.withCredentials = true;
 
@@ -56,27 +57,44 @@ export default function ChangeSolanaAddress() {
   };
 
   return (
-    <div className="container mx-auto px-4 py-8">
-      <h1 className="text-2xl font-bold mb-4">Change Solana Address</h1>
-      <div className="mb-4">
-        <p>Current Solana Address: {currentAddress || 'Not set'}</p>
-      </div>
-      <div className="mb-4">
-        <WalletMultiButton className='mb-4' />
-        <WalletDisconnectButton />
-      </div>
-      {connected && (
-        <div>
-          <p>New Solana Address: {publicKey?.toString()}</p>
-          <button
-            onClick={handleChangeAddress}
-            disabled={isLoading}
-            className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mt-4 disabled:opacity-50"
-          >
-            {isLoading ? 'Updating...' : 'Update Solana Address'}
-          </button>
+    <div className="min-h-screen flex flex-col">
+      <Header />
+      <div className="container mx-auto flex-1 flex items-center justify-center py-8 dark:bg-gray-900">
+        <div className="p-4 bg-white rounded-md shadow-sm dark:bg-gray-800 dark:text-white">
+          <div className="flex items-center justify-between mb-12">
+            <h1 className="text-3xl font-bold dark:text-white">
+              Change Solana Address
+            </h1>
+            <div className="flex items-center space-x-4">
+              <WalletMultiButton className="bg-white rounded-md shadow-sm dark:bg-gray-700" />
+              <WalletDisconnectButton className="bg-white rounded-md shadow-sm dark:bg-gray-700" />
+            </div>
+          </div>
+          <p className="text-lg mb-4">
+            Current Solana Address:
+            <span className="font-bold">{currentAddress || 'Not set'}</span>
+          </p>
+          {connected && (
+            <div className="mb-4">
+              <p className="text-lg">
+                New Solana Address:
+                <span className="font-bold">{publicKey?.toString()}</span>
+              </p>
+              <button
+                onClick={handleChangeAddress}
+                disabled={
+                  isLoading ||
+                  (!currentAddress && !publicKey) ||
+                  currentAddress === publicKey?.toString()
+                }
+                className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mt-4 disabled:opacity-50 dark:bg-blue-700 dark:hover:bg-blue-500"
+              >
+                {isLoading ? 'Updating...' : 'Update Solana Address'}
+              </button>
+            </div>
+          )}
         </div>
-      )}
+      </div>
     </div>
   );
 }
