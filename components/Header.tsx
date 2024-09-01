@@ -3,6 +3,7 @@ import axios from "axios";
 import { useRouter } from "next/router";
 import Link from "next/link";
 import { NavigationMenu, NavigationMenuItem, NavigationMenuLink, NavigationMenuList, navigationMenuTriggerStyle } from "./ui/navigation-menu";
+import { ModeToggle } from "./ModeToggle";
 
 interface User {
   name: string;
@@ -12,14 +13,12 @@ interface User {
 const Header: React.FC = () => {
   const [user, setUser] = useState<User | null>(null);
   const router = useRouter();
-
   useEffect(() => {
     axios
       .get<User>(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/user/details`)
       .then((res) => setUser(res.data))
       .catch((err) => console.error("Failed to load user details", err));
   }, []);
-
   const handleLogout = async () => {
     try {
       await axios.post(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/logout`);
@@ -56,9 +55,10 @@ const Header: React.FC = () => {
             <div className="h-10 w-10 rounded-full bg-gray-300 flex items-center justify-center text-gray-700 font-bold text-lg mr-4">
               {user.name.charAt(0).toUpperCase()}
             </div>
-            <div>
-              <h2 className="text-base font-medium">{user.name}</h2>
-              <p className="text-gray-600 text-xs">{user.email}</p>
+            <div className="flex items-center">
+              <h2 className="text-base font-medium mr-2">{user.name}</h2>
+              <ModeToggle />
+              <p className="text-gray-600 text-xs ml-2">{user.email}</p>
             </div>
             <button 
               onClick={handleLogout}

@@ -7,6 +7,7 @@ import { WalletMultiButton } from "@solana/wallet-adapter-react-ui";
 import { motion, AnimatePresence } from "framer-motion";
 import { verifyAuth } from "@/lib/authUtils";
 import { AuthResponse } from "@/lib/types";
+import { ModeToggle } from "@/components/ModeToggle";
 
 axios.defaults.withCredentials = true;
 
@@ -29,7 +30,7 @@ export default function Authorize() {
     if (
       authData.solanaAddressSet &&
       (userChoice === "claim" || authData.isAppInstalled) &&
-      authData.aadhaarPanVerified &&
+      authState.aadhaarPanVerified &&
       authData.authenticated
     ) {
       router.push("/dashboard");
@@ -144,7 +145,7 @@ export default function Authorize() {
           action={
             <button
               onClick={handleGithubAuthorization}
-              className="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded transition duration-300"
+              className="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded transition duration-300 dark:bg-blue-700 dark:hover:bg-blue-800"
             >
               Authorize with GitHub
             </button>
@@ -163,7 +164,7 @@ export default function Authorize() {
               type="text"
               placeholder={authState.aadhaarPan || "Enter Aadhaar/PAN"}
               onBlur={(e) => handleVerifyAadhaarPan(e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-800 dark:text-gray-300 dark:border-gray-700 dark:focus:ring-blue-500"
             />
           }
         />
@@ -179,13 +180,13 @@ export default function Authorize() {
             <div className="space-y-4">
               <button
                 onClick={() => setUserChoice("create")}
-                className="w-full bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded transition duration-300"
+                className="w-full bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded transition duration-300 dark:bg-green-700 dark:hover:bg-green-800"
               >
                 Create a Bounty
               </button>
               <button
                 onClick={() => setUserChoice("claim")}
-                className="w-full bg-purple-500 hover:bg-purple-600 text-white font-bold py-2 px-4 rounded transition duration-300"
+                className="w-full bg-purple-500 hover:bg-purple-600 text-white font-bold py-2 px-4 rounded transition duration-300 dark:bg-purple-700 dark:hover:bg-purple-800"
               >
                 Claim a Bounty
               </button>
@@ -203,7 +204,7 @@ export default function Authorize() {
           action={
             <button
               onClick={handleRepoInstallation}
-              className="bg-gray-800 hover:bg-gray-900 text-white font-bold py-2 px-4 rounded transition duration-300"
+              className="bg-gray-800 hover:bg-gray-900 text-white font-bold py-2 px-4 rounded transition duration-300 dark:bg-gray-700 dark:hover:bg-gray-800"
             >
               Install GitHub App
             </button>
@@ -218,15 +219,15 @@ export default function Authorize() {
         description="Link your Solana wallet to receive or send payments."
         action={
           <div className="space-y-4">
-            <WalletMultiButton className="!bg-orange-500 hover:!bg-orange-600 text-white font-bold py-2 px-4 rounded transition duration-300" />
+            <WalletMultiButton className="!bg-orange-500 hover:!bg-orange-600 text-white font-bold py-2 px-4 rounded transition duration-300 dark:bg-orange-700 dark:hover:bg-orange-800" />
             {connected && (
               <div>
-                <p className="text-sm text-gray-600 mb-2">
+                <p className="text-sm text-gray-600 mb-2 dark:text-gray-300">
                   Connected wallet: {publicKey?.toString()}
                 </p>
                 <button
                   onClick={handleSolanaConnection}
-                  className="w-full bg-orange-500 hover:bg-orange-600 text-white font-bold py-2 px-4 rounded transition duration-300"
+                  className="w-full bg-orange-500 hover:bg-orange-600 text-white font-bold py-2 px-4 rounded transition duration-300 dark:bg-orange-700 dark:hover:bg-orange-800"
                 >
                   Confirm Solana Wallet
                 </button>
@@ -244,8 +245,13 @@ export default function Authorize() {
 
   return (
     <Suspense fallback={<div className="flex items-center justify-center h-screen">Loading...</div>}>
-      <div className="min-h-screen bg-gray-100 flex flex-col items-center justify-center px-4">
-        <h1 className="text-4xl font-bold text-gray-800 mb-8">Authorize Your Account</h1>
+       <div className="fixed top-4 right-4">
+        <ModeToggle/>
+      </div>
+      <div className="min-h-screen bg-gray-100 flex flex-col items-center justify-center px-4 dark:bg-gray-900">
+        <h1 className="text-4xl font-bold text-gray-800 mb-8 dark:text-white">
+          Authorize Your Account
+        </h1>
         <AnimatePresence mode="wait">
           <motion.div
             key={+!!authState.authenticated + +!!authState.aadhaarPanVerified + (userChoice || "")}
