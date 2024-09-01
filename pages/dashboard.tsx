@@ -34,11 +34,11 @@ export default function Dashboard() {
 
 
   return (
-    <div>
+    <div className="dark:bg-gray-900">
       <Header /> 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        <div>
-          <h2 className="text-2xl mb-4 text-gray-700">Your Bounties</h2>
+        <div className="dark:text-gray-200">
+          <h2 className="text-2xl mb-4">Your Bounties</h2>
           <DashboardComponent />
         </div>
       </div>
