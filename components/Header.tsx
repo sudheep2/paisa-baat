@@ -32,7 +32,7 @@ const Header: React.FC = () => {
   };
 
   return (
-    <header className="bg-white shadow-md py-4 px-6">
+    <header className="bg-white dark:bg-gray-900 shadow-md py-4 px-6">
       <div className="container mx-auto flex justify-between items-center">
         <NavigationMenu>
       <NavigationMenuList className="flex items-center">
@@ -52,19 +52,19 @@ const Header: React.FC = () => {
           </NavigationMenuItem>
       </NavigationMenuList>
       </NavigationMenu>
-      <ModeToggle />
         {user && (
           <div className="flex items-center">
-            <div className="h-10 w-10 rounded-full bg-gray-300 flex items-center justify-center text-gray-700 font-bold text-lg mr-4">
+            <ModeToggle />
+            <div className="h-10 w-10 rounded-full bg-gray-300 dark:bg-gray-600 flex items-center justify-center text-gray-700 dark:text-gray-300 font-bold text-lg mr-4 ml-4">
               {user.name.charAt(0).toUpperCase()}
             </div>
             <div className="flex items-center">
               <h2 className="text-base font-medium mr-2">{user.name}</h2>
-              <p className="text-gray-600 text-xs ml-2">{user.email}</p>
+              <p className="text-gray-600 dark:text-gray-300 text-xs ml-2">{user.email}</p>
             </div>
             <button 
               onClick={handleLogout}
-              className="bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-4 rounded ml-4"
+              className="bg-red-500 dark:bg-red-600 hover:bg-red-600 dark:hover:bg-red-700 text-white font-bold py-2 px-4 rounded ml-4"
             >
               Logout
             </button>

@@ -8,6 +8,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { verifyAuth } from "@/lib/authUtils";
 import { AuthResponse } from "@/lib/types";
 import { ModeToggle } from "@/components/ModeToggle";
+import { Button } from "@/components/ui/button";
 
 axios.defaults.withCredentials = true;
 
@@ -178,18 +179,18 @@ export default function Authorize() {
           description="Select whether you want to create or claim a bounty."
           action={
             <div className="space-y-4">
-              <button
+              <Button
                 onClick={() => setUserChoice("create")}
-                className="w-full bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded transition duration-300 dark:bg-green-700 dark:hover:bg-green-800"
+                className="w-full  hover:bg-green-600 text-white font-bold py-2 px-4 rounded transition duration-300 dark:bg-green-700 dark:hover:bg-green-800"
               >
                 Create a Bounty
-              </button>
-              <button
+              </Button>
+              <Button
                 onClick={() => setUserChoice("claim")}
-                className="w-full bg-purple-500 hover:bg-purple-600 text-white font-bold py-2 px-4 rounded transition duration-300 dark:bg-purple-700 dark:hover:bg-purple-800"
+                className="w-full  hover:bg-purple-600 text-white font-bold py-2 px-4 rounded transition duration-300 dark:bg-purple-700 dark:hover:bg-purple-800"
               >
                 Claim a Bounty
-              </button>
+              </Button>
             </div>
           }
         />
