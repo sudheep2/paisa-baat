@@ -31,7 +31,7 @@ export default function Authorize() {
     if (
       authData.solanaAddressSet &&
       (userChoice === "claim" || authData.isAppInstalled) &&
-      authState.aadhaarPanVerified &&
+      authData.aadhaarPanVerified &&
       authData.authenticated
     ) {
       router.push("/dashboard");
