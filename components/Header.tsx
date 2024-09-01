@@ -17,7 +17,10 @@ const Header: React.FC = () => {
     axios
       .get<User>(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/user/details`)
       .then((res) => setUser(res.data))
-      .catch((err) => console.error("Failed to load user details", err));
+      .catch((err) => {
+        console.error("Failed to load user details", err);
+        router.push("/");
+      });
   }, []);
   const handleLogout = async () => {
     try {
