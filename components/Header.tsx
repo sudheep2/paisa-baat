@@ -52,7 +52,7 @@ const Header: React.FC = () => {
           </NavigationMenuItem>
       </NavigationMenuList>
       </NavigationMenu>
-
+      <ModeToggle />
         {user && (
           <div className="flex items-center">
             <div className="h-10 w-10 rounded-full bg-gray-300 flex items-center justify-center text-gray-700 font-bold text-lg mr-4">
@@ -60,7 +60,6 @@ const Header: React.FC = () => {
             </div>
             <div className="flex items-center">
               <h2 className="text-base font-medium mr-2">{user.name}</h2>
-              <ModeToggle />
               <p className="text-gray-600 text-xs ml-2">{user.email}</p>
             </div>
             <button 
