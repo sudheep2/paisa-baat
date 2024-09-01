@@ -123,30 +123,24 @@ export default function DashboardComponent() {
 
   if (isLoading) {
     return (
-      <div className="text-center text-lg mt-8 dark:text-white">
-        Loading dashboard data...
-      </div>
+      <div className="text-center text-lg mt-8">Loading dashboard data...</div>
     );
   }
 
   if (error) {
     return (
-      <div className="text-center text-lg mt-8 text-red-500 dark:text-red-300">
+      <div className="text-center text-lg mt-8 text-red-500">
         Error: {error}
       </div>
     );
   }
 
   return (
-    <div className="max-w-[1200px] mx-auto p-8 dark:bg-gray-800">
-      <h1 className="text-4xl mb-8 text-gray-800 dark:text-white">
-        Dashboard
-      </h1>
+    <div className="max-w-[1200px] mx-auto p-8">
+      <h1 className="text-4xl mb-8 text-gray-800">Dashboard</h1>
 
       <section className="mb-12">
-        <h2 className="text-2xl mb-4 text-gray-700 dark:text-white">
-          Created Bounties
-        </h2>
+        <h2 className="text-2xl mb-4 text-gray-700">Created Bounties</h2>
         {createdBounties.length > 0 ? (
           <div className="grid grid-cols-3 gap-4">
             {" "}
@@ -159,12 +153,11 @@ export default function DashboardComponent() {
                   claimed_at: bounty.claimed_at || "",
                 }}
                 onDelete={handleDeleteBounty}
-                variant="created"
               />
             ))}
           </div>
         ) : (
-          <div className="text-center p-8 bg-gray-100 rounded-lg dark:bg-gray-700">
+          <div className="text-center p-8 bg-gray-100 rounded-lg">
             <p>You haven&apos;t created any bounties yet.</p>
             <Image
               src="/path-to-create-bounty-image.png"
@@ -178,24 +171,22 @@ export default function DashboardComponent() {
 
       {bountiesToApprove.length > 0 && (
         <section className="mb-12">
-          <h2 className="text-2xl mb-4 text-gray-700 dark:text-white">
-            Bounties to Approve
-          </h2>
+          <h2 className="text-2xl mb-4 text-gray-700">Bounties to Approve</h2>
           <div className="grid grid-cols-[repeat(auto-fill,minmax(300px,1fr))] gap-6">
             {bountiesToApprove.map((bounty) => (
               <div
                 key={bounty.id}
                 className={
                   bounty.status === "payment pending"
-                    ? "bg-slate-950 rounded-lg p-6 shadow-md dark:bg-gray-700"
-                    : "bg-gray-100 rounded-lg p-6 shadow-md dark:bg-gray-700"
+                    ? "bg-slate-950 rounded-lg p-6 shadow-md"
+                    : "bg-gray-100 rounded-lg p-6 shadow-md"
                 }
               >
                 <h3
                   className={
                     bounty.status === "payment pending"
-                      ? "text-lg mb-2 text-white dark:text-gray-200"
-                      : "text-lg mb-2 text-gray-800 dark:text-gray-200"
+                      ? "text-lg mb-2 text-white"
+                      : "text-lg mb-2 text-gray-800"
                   }
                 >
                   {bounty.issue_title}
@@ -203,8 +194,8 @@ export default function DashboardComponent() {
                 <p
                   className={
                     bounty.status === "payment pending"
-                      ? "text-sm mb-2 text-white dark:text-gray-200"
-                      : "text-sm mb-2 text-gray-800 dark:text-gray-200"
+                      ? "text-sm mb-2 text-white"
+                      : "text-sm mb-2 text-gray-800"
                   }
                 >
                   Amount: ${bounty.amount}
@@ -212,8 +203,8 @@ export default function DashboardComponent() {
                 <p
                   className={
                     bounty.status === "payment pending"
-                      ? "text-sm mb-2 text-white dark:text-gray-200"
-                      : "text-sm mb-2 text-gray-800 dark:text-gray-200"
+                      ? "text-sm mb-2 text-white"
+                      : "text-sm mb-2 text-gray-800"
                   }
                 >
                   Claimants:
@@ -230,7 +221,7 @@ export default function DashboardComponent() {
                   href={bounty.issue_url}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-block mt-2 text-blue-500 hover:underline dark:text-blue-300"
+                  className="inline-block mt-2 text-blue-500 hover:underline"
                 >
                   View Issue
                 </a>
@@ -241,21 +232,15 @@ export default function DashboardComponent() {
       )}
 
       <section className="mb-12">
-        <h2 className="text-2xl mb-4 text-gray-700 dark:text-white">
-          Claimed Bounties
-        </h2>
+        <h2 className="text-2xl mb-4 text-gray-700">Claimed Bounties</h2>
         {claimedBounties.length > 0 ? (
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
             {claimedBounties.map((bounty) => (
-              <BountyCard
-                key={bounty.id}
-                bounty={bounty}
-                variant="claimed"
-              />
+              <BountyCard key={bounty.id} bounty={bounty} variant="claimed" />
             ))}
           </div>
         ) : (
-          <div className="text-center p-8 bg-gray-100 rounded-lg dark:bg-gray-700">
+          <div className="text-center p-8 bg-gray-100 rounded-lg">
             <p>You haven&apos;t claimed any bounties yet.</p>
             <Image
               src="/path-to-claim-bounty-image.png"

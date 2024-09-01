@@ -30,39 +30,33 @@ const BountyCard: React.FC<BountyCardProps> = ({
   onDelete,
   variant = "created",
 }) => {
-  const bgColor =
-    variant === "created" ? "bg-white dark:bg-gray-800" : "bg-green-100 dark:bg-green-900"; // Different background for claimed bounties
-  const textColor =
-    variant === "created" ? "text-gray-800 dark:text-white" : "text-green-800 dark:text-green-300";
+  const bgColor = variant === "created" ? "bg-white" : "bg-green-100"; // Different background for claimed bounties
+  const textColor = variant === "created" ? "text-gray-800" : "text-green-800";
 
   return (
-    <Card className={`${bgColor} shadow-md p-6 dark:shadow-none`}>
+    <Card className={`${bgColor} shadow-md p-6`}>
       <CardHeader>
         <CardTitle className={textColor}>{bounty.issue_title}</CardTitle>
         <CardDescription>Repository: {bounty.repository}</CardDescription>
       </CardHeader>
       <CardContent>
-        <p className="dark:text-white">Amount: ${bounty.amount}</p>
-        {variant === "created" && <p className="dark:text-white">Status: {bounty.status}</p>}
+        <p>Amount: ${bounty.amount}</p>
+        {variant === "created" && <p>Status: {bounty.status}</p>}
         {variant === "claimed" && (
           <>
-            <p className="dark:text-white">Status: {bounty.status}</p>
-            <p className="dark:text-white">Claimed at: {new Date(bounty.claimed_at).toLocaleString()}</p>
+            <p>Status: {bounty.status}</p>
+            <p>Claimed at: {new Date(bounty.claimed_at).toLocaleString()}</p>
           </>
         )}
       </CardContent>
-      <CardFooter className="flex justify-between dark:bg-gray-800">
-        <Button variant="link" className="dark:text-white">
+      <CardFooter className="flex justify-between">
+        <Button variant="link">
           <Link href={bounty.issue_url} target="_blank">
             View Issue
           </Link>
         </Button>
         {onDelete && (
-          <Button
-            variant="destructive"
-            onClick={() => onDelete(bounty.id)}
-            className="dark:text-white"
-          >
+          <Button variant="destructive" onClick={() => onDelete(bounty.id)}>
             Delete
           </Button>
         )}
