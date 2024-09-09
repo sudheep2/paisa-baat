@@ -9,6 +9,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import Link from "next/link";
+import EditBountyModal from './EditBountyModal'
 
 interface BountyCardProps {
   bounty: {
@@ -23,12 +24,14 @@ interface BountyCardProps {
   };
   onDelete?: (bountyId: number) => void; // Make onDelete optional
   variant?: "created" | "claimed"; // Add a variant prop
+  onUpdate: () => void; // Add onUpdate callback
 }
 
 const BountyCard: React.FC<BountyCardProps> = ({
   bounty,
   onDelete,
   variant = "created",
+  onUpdate
 }) => {
   const bgColor =
     variant === "created" ? "bg-white dark:bg-gray-800" : "bg-green-100 dark:bg-violet-500";
@@ -67,10 +70,17 @@ const BountyCard: React.FC<BountyCardProps> = ({
           <Button
             variant="destructive"
             onClick={() => onDelete(bounty.id)}
-            className="dark:text-gray-400"
+            className="dark:text-white-400"
           >
             Delete
           </Button>
+        )}
+        {variant === "created" && (
+          <EditBountyModal
+            bountyId={bounty.id}
+            initialAmount={bounty.amount}
+            onUpdate={onUpdate} 
+          />
         )}
       </CardFooter>
     </Card>

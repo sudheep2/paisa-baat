@@ -181,13 +181,13 @@ export default function Authorize() {
             <div className="space-y-4">
               <Button
                 onClick={() => setUserChoice("create")}
-                className="w-full  hover:bg-green-600 text-white font-bold py-2 px-4 rounded transition duration-300 dark:bg-green-700 dark:hover:bg-green-800"
+                className="w-full  hover:bg-green-600 text-white dark:text-black font-bold py-2 px-4 rounded transition duration-300 dark:bg-gray-300 dark:hover:bg-green-800"
               >
                 Create a Bounty
               </Button>
               <Button
                 onClick={() => setUserChoice("claim")}
-                className="w-full  hover:bg-purple-600 text-white font-bold py-2 px-4 rounded transition duration-300 dark:bg-purple-700 dark:hover:bg-purple-800"
+                className="w-full  hover:bg-purple-600 text-white dark:text-black font-bold py-2 px-4 rounded transition duration-300 dark:bg-gray-300 dark:hover:bg-purple-800"
               >
                 Claim a Bounty
               </Button>

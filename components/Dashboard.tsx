@@ -3,7 +3,7 @@ import axios from "axios";
 import Image from "next/image";
 import { useRouter } from "next/router";
 import DropdownForm from "./DropdownForm";
-import BountyCard from "./ui/bountyCard";
+import BountyCard from "./bountyCard";
 
 interface Bounty {
   id: number;
@@ -160,6 +160,7 @@ export default function DashboardComponent() {
                 }}
                 onDelete={handleDeleteBounty}
                 variant="created"
+                onUpdate={fetchDashboardData}
               />
             ))}
           </div>
@@ -253,6 +254,7 @@ export default function DashboardComponent() {
                 key={bounty.id}
                 bounty={bounty}
                 variant="claimed"
+                onUpdate={fetchDashboardData}
               />
             ))}
           </div>
