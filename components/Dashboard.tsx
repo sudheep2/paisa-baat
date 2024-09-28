@@ -170,9 +170,9 @@ export default function DashboardComponent() {
               You haven&apos;t created any bounties yet.
             </p>
             <Image
-              src="/path-to-create-bounty-image.png"
+              src="/create-bounty.png"
               alt="How to create a bounty"
-              width={300}
+              width={1000}
               height={200}
             />
           </div>

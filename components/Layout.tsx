@@ -12,7 +12,7 @@ export default function Layout({ children }: LayoutProps) {
       <Head>
         <title>GitHub Bounty App</title>
         <meta name="description" content="Manage bounties on GitHub issues" />
-        <link rel="icon" href="/favicon.ico" />
+        <link rel="icon" href="/paisa-baat.jpeg" />
       </Head>
       <main>{children}</main>
     </>
